@@ -255,7 +255,7 @@ class Prop:
 '''
 Main
 '''
-class BINMap:
+class BattleMap:
     def __init__(self):
         self.atlases = []
         self.batches = []

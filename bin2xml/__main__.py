@@ -21,8 +21,15 @@ SOFTWARE.
 '''
 
 from sys import argv
-from .BINmap import BINMap
+from .BattleMap import BattleMap
+from .XMLMap import XMLMap
 
 with open(argv[1], "rb") as file:
-    binMap = BINMap()
-    binMap.read(file)
+    battleMap = BattleMap()
+    battleMap.read(file)
+
+    print("Building XML")
+    xmlMap = XMLMap()
+    for prop in battleMap.staticGeometry:
+        xmlMap.addProp(prop.libraryName, prop.groupName, prop.name, "", prop.position, 0.0)
+    xmlMap.exportXML(argv[2])
