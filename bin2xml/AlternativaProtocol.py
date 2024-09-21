@@ -112,7 +112,7 @@ def readPacket(stream):
         packageGzip = packageLengthField & 0b01000000
 
     # Decompress gzip data
-    package = stream.read(packageLength)
+    package = stream.read()
     if packageGzip:
         print("Decompressing packet")
         package = decompress(package)
