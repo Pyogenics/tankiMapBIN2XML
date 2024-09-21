@@ -214,6 +214,44 @@ class Material:
         if optionalMask.getOptional():
             self.vector4Parameters = AlternativaProtocol.readObjectArray(stream, Vector4Parameter, optionalMask)
 
+class SpawnPoint:
+    def __init__(self):
+        self.position = (0.0, 0.0, 0.0)
+        self.rotation = (0.0, 0.0, 0.0)
+        self.type = 0
+
+    def read(self, stream, optionalMask):
+        print("Read SpawnPoint")
+        self.position = unpackStream(">3f", stream)
+        self.rotation = unpackStream(">3f", stream)
+        self.type, = unpackStream(">I", stream)
+
+class Prop:
+    def __init__(self):
+        self.ID = 0
+        self.libraryName = ""
+        self.materialID = 0
+        self.name = ""
+        self.position = (0.0, 0.0, 0.0)
+
+        # Optional
+        self.rotation = (0.0, 0.0, 0.0)
+        self.scale = (0.0, 0.0, 0.0)
+
+    def read(self, stream, optionalMask):
+        print(f"Read Prop")
+        if optionalMask.getOptional():
+            self.groupName = AlternativaProtocol.readString(stream)
+        self.ID, = unpackStream(">I", stream)
+        self.libraryName = AlternativaProtocol.readString(stream)
+        self.materialID, = unpackStream(">I", stream)
+        self.name = AlternativaProtocol.readString(stream)
+        self.position = unpackStream(">3f", stream)
+        if optionalMask.getOptional():
+            self.rotation = unpackStream(">3f", stream)
+        if optionalMask.getOptional():
+            self.scale = unpackStream(">3f", stream)
+
 '''
 Main
 '''
@@ -250,16 +288,6 @@ class BINMap:
         self.collisionGeometryOutsideGamingZone = CollisionGeometry()
         self.collisionGeometryOutsideGamingZone.read(packet, optionalMask)
         self.materials = AlternativaProtocol.readObjectArray(packet, Material, optionalMask)
-
-'''        if optionalMask.getOptional():
-            self.readBatches(packet, optionalMask)
         if optionalMask.getOptional():
-            self.readCollisionGeometry(packet, optionalMask)
-        if optionalMask.getOptional():
-            self.readCollisionGeometryOutsideGamingZone(packet, optionalMask)
-        if optionalMask.getOptional():
-            self.readMaterials(packet, optionalMask)
-        if optionalMask.getOptional():
-            self.readSpawnPoints(packet, optionalMask)
-        if optionalMask.getOptional():
-            self.readStaticGeometry(packet, optionalMask)'''
+            self.spawnPoints = AlternativaProtocol.readObjectArray(packet, SpawnPoint, optionalMask)
+        self.staticGeometry = AlternativaProtocol.readObjectArray(packet, Prop, optionalMask)
