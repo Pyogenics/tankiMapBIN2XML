@@ -106,15 +106,15 @@ def readPacket(stream):
         packageGzip = packageLengthField & 0b01000000
     else:
         # Long package: 31 bits
-        packageLength += (packageLengthField & 0b01111111) << 24
+        packageLength += (packageLengthField & 0b00111111) << 24
         packageLength += int.from_bytes(stream.read(3), "little")
 
-        packageGzip = True
+        packageGzip = packageLengthField & 0b01000000
 
     # Decompress gzip data
-    package = stream.read()
+    package = stream.read(packageLength)
     if packageGzip:
-        print("Decompressing package")
+        print("Decompressing packet")
         package = decompress(package)
     package = BytesIO(package)
     

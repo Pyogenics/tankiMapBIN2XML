@@ -20,7 +20,46 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 '''
 
-from .AlternativaProtocol import readPacket, OptionalMask
+from .IOTools import unpackStream
+from . import AlternativaProtocol
+
+'''
+Objects
+'''
+class AtlasRect:
+    def __init__(self):
+        self.height = 0
+        self.libraryName = ""
+        self.name = ""
+        self.width = 0
+        self.x = 0
+        self.y = 0
+
+    def read(self, stream, optionalMask):
+        print("Read AtlasRect")
+        self.height, = unpackStream(">I", stream)
+        self.libraryName = AlternativaProtocol.readString(stream)
+        self.name = AlternativaProtocol.readString(stream)
+        self.width, self.x, self.y = unpackStream(">3I", stream)
+
+'''
+Main objects
+'''
+class Atlas:
+    def __init__(self):
+        self.height = 0
+        self.name = ""
+        self.padding = 0
+        self.rects = []
+        self.width = 0
+
+    def read(self, stream, optionalMask):
+        print(f"Read Atlas {stream.tell()}")
+        self.height, unpackStream(">i", stream)
+        self.name = AlternativaProtocol.readString(stream)
+        self.padding = unpackStream(">I", stream)
+        self.rects = AlternativaProtocol.readObjectArray(stream, AtlasRect, optionalMask)
+        self.width, = unpackStream(">I", stream)
 
 class BINMap:
     def __init__(self):
@@ -32,39 +71,24 @@ class BINMap:
         self.spawnPoints = []
         self.staticGeometry = []
 
-    def readAtlases(self, stream, optionalMask):
-        print("Reading atlases")
-
-    def readBatches(self, stream, optionalMask):
-        print("Reading batches")
-
-    def readCollisionGeometry(self, stream, optionalMask):
-        print("Reading collision geometry")
-
-    def readCollisionGeometryOutsideGamingZone(self, stream, optionalMask):
-        print("Reading collision geometry outside gaming zone")
-
-    def readMaterials(self, stream, optionalMask):
-        print("Reading materials")
-
-    def readSpawnPoints(self, stream, optionalMask):
-        print("Reading spawn points")
-
-    def readStaticGeometry(self, stream, optionalMask):
-        print("Reading static geometry")
-
     def read(self, stream):
         print("Reading BIN map")
 
         # Read packet
-        optionalMask = OptionalMask()
-        optionalMask.read(stream)
-        packet = readPacket(stream)
+        packet = AlternativaProtocol.readPacket(stream)
+        with open("packet.bin", "wb") as packetFile:
+            packetFile.write(
+                packet.read()
+            )
+            packet.seek(0)
+        optionalMask = AlternativaProtocol.OptionalMask()
+        optionalMask.read(packet)
 
         # Read data
         if optionalMask.getOptional():
-            self.readAtlases(packet, optionalMask)
-        if optionalMask.getOptional():
+            self.atlases = AlternativaProtocol.readObjectArray(packet, Atlas, optionalMask)
+
+'''        if optionalMask.getOptional():
             self.readBatches(packet, optionalMask)
         if optionalMask.getOptional():
             self.readCollisionGeometry(packet, optionalMask)
@@ -75,4 +99,4 @@ class BINMap:
         if optionalMask.getOptional():
             self.readSpawnPoints(packet, optionalMask)
         if optionalMask.getOptional():
-            self.readStaticGeometry(packet, optionalMask)
+            self.readStaticGeometry(packet, optionalMask)'''
