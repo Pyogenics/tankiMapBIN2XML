@@ -199,6 +199,12 @@ class Material:
         self.vector3Parameters = None
         self.vector4Parameters = None
 
+    def getTextureParameterByName(self, name):
+        for textureParameter in self.textureParameters:
+            if textureParameter.name == name: return textureParameter
+
+        raise RuntimeError(f"Couldn't find texture parameter with name: {name}")
+
     def read(self, stream, optionalMask):
         print(f"Read Material")
         self.ID, = unpackStream(">I", stream)
@@ -235,6 +241,7 @@ class Prop:
         self.position = (0.0, 0.0, 0.0)
 
         # Optional
+        self.groupName = ""
         self.rotation = (0.0, 0.0, 0.0)
         self.scale = (0.0, 0.0, 0.0)
 
@@ -265,6 +272,19 @@ class BattleMap:
         self.spawnPoints = []
         self.staticGeometry = []
 
+
+    '''
+    Getters
+    '''
+    def getMaterialByID(self, materialID):
+        for material in self.materials:
+            if material.ID == materialID: return material
+        
+        raise RuntimeError(f"Couldn't find material with ID: {materialID}")
+
+    '''
+    IO
+    '''
     def read(self, stream):
         print("Reading BIN map")
 

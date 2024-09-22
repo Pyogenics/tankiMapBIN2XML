@@ -32,7 +32,7 @@ class XMLMap:
         positionX, positionY, positionZ = position
         
         prop = ET.SubElement(self.staticGeometry, "prop")
-        prop.attrib["libray-name"] = libraryName
+        prop.attrib["library-name"] = libraryName
         prop.attrib["group-name"] = groupName
         prop.attrib["name"] = name
 

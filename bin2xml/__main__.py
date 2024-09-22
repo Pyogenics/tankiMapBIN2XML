@@ -31,5 +31,11 @@ with open(argv[1], "rb") as file:
     print("Building XML")
     xmlMap = XMLMap()
     for prop in battleMap.staticGeometry:
-        xmlMap.addProp(prop.libraryName, prop.groupName, prop.name, "", prop.position, 0.0)
+        _, _, rotationZ = prop.rotation
+        textureName = battleMap.getMaterialByID(
+            prop.materialID
+        ).getTextureParameterByName("_MainTex").textureName
+
+        # Use empty texture name for now, this allows AE to default to model textures
+        xmlMap.addProp(prop.libraryName, prop.groupName, prop.name, "", prop.position, rotationZ)
     xmlMap.exportXML(argv[2])
