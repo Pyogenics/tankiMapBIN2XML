@@ -152,6 +152,22 @@ class Atlas:
         self.rects = []
         self.width = 0
 
+    # Get the rect's texture from an atlas
+    # XXX: Handle padding?
+    def resolveRectImage(self, rectName, atlasImage):
+        rect = None
+        for childRect in self.rects:
+            if childRect.name == rectName:
+                rect = childRect
+        if rect == None:
+            raise RuntimeError(f"Couldn't find rect with name: {rectName}")
+        
+        # Cut the texture out
+        rectTexture = atlasImage.crop(
+            (rect.x, rect.y, rect.x+rect.width, rect.y+rect.height)
+        )
+        return rectTexture
+
     def read(self, stream, optionalMask):
         print("Read Atlas")
         self.height, unpackStream(">i", stream)
@@ -271,7 +287,6 @@ class BattleMap:
         self.materials = []
         self.spawnPoints = []
         self.staticGeometry = []
-
 
     '''
     Getters
